@@ -8,7 +8,10 @@
 </head>
 <body>
 
-    <h1>カスタムタイピングゲーム</h1>
+    <header>
+        <h1>タイピングゲーム</h1>
+        <button id="settings-button" class="control-button">⚙️</button>
+    </header>
 
     <div class="game-container">
         <div class="score-display">
@@ -31,19 +34,9 @@
         <button id="showResultButton" class="small-button" style="display:none;">結果を再表示</button>
     </div>
 
-    <div class="file-import-area">
-        <label for="romajiFile">ローマ字ルール</label>
-        <input type="file" id="romajiFile" accept=".txt">
-        <div class="file-name" id="romajiFileName">未選択（デフォルトを使用）</div>
-        <button id="resetRomajiButton" class="small-button">ローマ字ルールをデフォルトに戻す</button>
-        <label for="wordsFile">問題ファイル</label>
-        <input type="file" id="wordsFile" accept=".txt">
-        <div class="file-name" id="wordsFileName">未選択（デフォルトを使用）</div>
-        <button id="resetWordsButton" class="small-button">問題ファイルをデフォルトに戻す</button>
-    </div>
-
     <div id="resultModal" class="modal">
         <div class="modal-content">
+            <span class="close-button" id="modal-close-button">&times;</span>
             <h2>ゲーム終了！</h2>
             <div class="result-table-container">
                 <table class="result-table">
@@ -72,8 +65,48 @@
                 </table>
             </div>
             <div class="modal-actions">
-                <button id="quitButton">やめる</button>
                 <button id="restartButton">もう一度遊ぶ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-sidebar">
+        <div class="modal-content">
+            <h2>設定</h2>
+            <div class="setting-item">
+                <label for="typing-sound-toggle">タイピング音:</label>
+                <input type="checkbox" id="typing-sound-toggle" checked>
+            </div>
+            <div class="setting-item">
+                <label for="mistype-sound-toggle">ミスタイプ音:</label>
+                <input type="checkbox" id="mistype-sound-toggle" checked>
+            </div>
+            <div class="setting-item">
+                <label for="mistype-effect-toggle">ミスしたときの演出:</label>
+                <input type="checkbox" id="mistype-effect-toggle" checked>
+            </div>
+
+            <hr style="margin: 20px 0; border-color: #eee;">
+
+            <h2>ファイルインポート</h2>
+            <div class="file-import-section">
+                <label for="romajiFile" class="file-import-label">ローマ字ルール:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="romajiFile" accept=".txt" class="hidden-file-input">
+                    <button type="button" class="small-button import-button" data-target="romajiFile">ファイルを選択</button>
+                    <div class="file-name" id="romajiFileName">未選択（デフォルトを使用）</div>
+                </div>
+                <button id="resetRomajiButton" class="small-button">デフォルトに戻す</button>
+            </div>
+
+            <div class="file-import-section">
+                <label for="wordsFile" class="file-import-label">問題ファイル:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="wordsFile" accept=".txt" class="hidden-file-input">
+                    <button type="button" class="small-button import-button" data-target="wordsFile">ファイルを選択</button>
+                    <div class="file-name" id="wordsFileName">未選択（デフォルトを使用）</div>
+                </div>
+                <button id="resetWordsButton" class="small-button">デフォルトに戻す</button>
             </div>
         </div>
     </div>
