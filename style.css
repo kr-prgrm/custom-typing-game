@@ -8,8 +8,10 @@ body {
 }
 
 h1 {
-    color: #388e3c;
-    margin-bottom: 10px;
+    color: #444;
+    margin-bottom: 20px;
+    font-weight: 300;
+    letter-spacing: 1px;
 }
 
 .instruction {
@@ -19,15 +21,26 @@ h1 {
     text-align: center;
 }
 
-.file-import-area {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
+#settings-button {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 28px;
+    z-index: 1002;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    border: none; /* 枠線を消す */
+}
+
+#settings-button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .file-name {
@@ -55,31 +68,56 @@ h1 {
 
 .game-container {
     margin-top: 20px;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    max-width: 600px;
+    background-color: #ffffff;
+    padding: 25px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    width: 90%;
+    max-width: 700px;
     text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+#showResultButton {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+    display: none; /* Initially hidden */
 }
 
 .score-display {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #333;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: normal;
+    color: #6c757d;
 }
 
 .target-word-area {
-    min-height: 100px;
+    min-height: 120px;
     margin-bottom: 20px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: #eee;
-    text-align: left;
-    overflow: hidden; /* Prevent text from spilling out */
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    text-align: center; /* Center the text blocks */
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    transition: background-color 0.2s ease; /* Smooth transition for error flash */
+}
+
+/* New error flash for the whole target word area */
+.target-word-area.error-flash {
+    background-color: #ffe0e0; /* 薄い赤 */
 }
 
 .target-text {
@@ -152,62 +190,256 @@ h1 {
     background-color: #f9f9f9;
 }
 
-/* モーダル */
+/* モーダル共通スタイル */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    backdrop-filter: blur(5px); /* Add blur for a modern look */
 }
 
 .modal-content {
     background: linear-gradient(145deg, #ffffff, #f5f7fa);
-    margin: 12% auto;
+    margin: 12% auto; /* 12% from the top and centered */
     padding: 24px 28px;
     border: none;
     width: 80%;
-    max-width: 440px;
+    max-width: 500px;
     text-align: center;
     border-radius: 14px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
     position: relative;
     overflow: hidden;
+    animation: fadeIn 0.3s ease-out; /* Add fade-in animation */
 }
 
-.modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 15px;
+/* Sidebar for Settings */
+#settings-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 370px; /* Adjust width as needed */
+    height: 100%;
+    background-color: #f8f9fa; /* Lighter background for sidebar */
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%); /* Hidden by default */
+    transition: transform 0.3s ease-in-out;
+    z-index: 1001; /* Above game content */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+#settings-sidebar.sidebar-open {
+    transform: translateX(0); /* Slide in */
+}
+
+/* Adjust modal-content inside sidebar */
+#settings-sidebar .modal-content {
+    background: none; /* No gradient background for sidebar content */
+    box-shadow: none; /* No shadow for inner content */
+    margin: 0; /* No auto margin */
+    padding: 20px; /* Adjust padding as needed */
+    width: 100%;
+    /* Removed height: 100%; to allow scrolling */
+    border-radius: 0; /* No border-radius for inner content */
+    animation: none; /* Remove fade-in animation */
+    position: static; /* Remove relative positioning if not needed */
+    overflow: hidden; /* Prevent horizontal overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Close button for modals */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #aaa;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .modal-content h2 {
     margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.8em;
+    margin-bottom: 25px;
+    font-size: 1.9em;
     color: #2c3e50;
+    font-weight: 600;
 }
 
-.modal-content::before {
-    content: "";
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item label {
+    font-size: 1.1em;
+    color: #34495e;
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"] {
+    position: relative;
+    width: 40px;
+    height: 24px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #ccc;
+    outline: none;
+    border-radius: 12px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"]::before {
+    content: '';
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    background: #fff;
+    transform: translateX(0);
+    transition: transform 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.setting-item input[type="checkbox"]:checked {
+    background: #2ecc71; /* Green for checked state */
+}
+
+.setting-item input[type="checkbox"]:checked::before {
+    transform: translateX(16px);
+}
+
+/* File Import Section Styling */
+.hidden-file-input {
+    display: none;
+}
+
+.file-import-section {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-import-label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.import-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+    text-align: center;
+}
+.import-button:hover {
+    background-color: #2980b9;
+}
+
+.file-input-wrapper .file-name {
+    flex-grow: 1;
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9em; /* Ensure consistent font size */
+    color: #666; /* Ensure consistent color */
+}
+
+.file-import-section .small-button { /* Targets reset buttons within import section */
+    margin-top: 10px;
+    align-self: flex-start;
+    padding: 8px 15px; /* Slightly larger padding for consistency */
+}
+
+/* Adjust h2 and hr spacing within modal-content */
+#settings-sidebar .modal-content h2 {
+    margin-top: 20px; /* Add margin to top of sub-section h2 */
+    margin-bottom: 15px;
+    font-size: 1.5em; /* Slightly smaller for sub-sections */
+}
+#settings-sidebar .modal-content h2:first-of-type {
+    margin-top: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 25px 0; /* More spacing for separator */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+.modal.closing .modal-content {
+    animation: fadeOut 0.3s ease-out forwards;
 }
 
 div.info {
-    background-color: #ecf0f1;
-    padding: 8px 12px;
-    border-radius: 5px;
-    display: inline-block;
-    margin: 5px 0;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    color: #6c757d; /* Label color */
+    font-size: 1em;
+}
+
+div.info span {
+    font-weight: 600;
+    color: #343a40; /* Value color */
+    font-size: 1.2em;
+    margin: 0 0.2em;
 }
 
 .typed-correct {
@@ -229,17 +461,7 @@ div.info {
     border-radius: 3px;
 }
 
-.file-import-area {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+
 
 #resultModal {
     display: none;
@@ -255,23 +477,18 @@ div.info {
 
 .error-flash {
     background-color: #ffe0e0; /* 薄い赤 */
-    animation: shake 0.2s; /* 揺れアニメーション */
-}
-
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
 }
 
 /* タイマーの残り時間が少ない時のスタイル */
 .score-display .info.low-time {
-    background-color: #ffe0e0; /* 薄い赤色の背景 */
-    border-color: red; /* 枠線を赤く */
-    color: red; /* テキストも赤く */
+    background-color: #d9534f; /* 濃い赤色 */
+    color: white; /* 白文字 */
     font-weight: bold;
+    padding: 5px 12px; /* 余白を大きく */
+    border-radius: 8px; /* 角を丸く */
+}
+.score-display .info.low-time span {
+    color: white;
 }
 
 /* 結果表示モーダルのテーブル */
