@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタムタイピングゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>カスタムタイピングゲーム</h1>
+
+    <div class="game-container">
+        <div class="score-display">
+            <div class="info">打鍵数: <span id="keystrokes">0</span> 回</div>
+            <div class="info">文字数: <span id="characters">0</span> 文字</div>
+            <div class="info">ミス: <span id="miss">0</span> 回</div>
+            <div class="info">正誤率: <span id="accuracy">100.0</span> %</div>
+            <div class="info">打鍵速度: <span id="typingSpeed">0.00</span> 打/秒</div>
+            <div class="info">残り時間: <span id="time-left-display">--</span> 秒</div>
+        </div>
+
+        <div class="target-word-area">
+            <div id="targetKanji" class="target-text"></div>
+            <div id="targetKana" class="target-text"></div>
+            <div id="targetRomaji" class="target-text"></div>
+        </div>
+    </div>
+
+    <div id="postGameControls" style="margin-top: 10px; text-align: center;">
+        <button id="showResultButton" class="small-button" style="display:none;">結果を再表示</button>
+    </div>
+
+    <div class="file-import-area">
+        <label for="romajiFile">ローマ字ルール</label>
+        <input type="file" id="romajiFile" accept=".txt">
+        <div class="file-name" id="romajiFileName">未選択（デフォルトを使用）</div>
+        <button id="resetRomajiButton" class="small-button">ローマ字ルールをデフォルトに戻す</button>
+        <label for="wordsFile">問題ファイル</label>
+        <input type="file" id="wordsFile" accept=".txt">
+        <div class="file-name" id="wordsFileName">未選択（デフォルトを使用）</div>
+        <button id="resetWordsButton" class="small-button">問題ファイルをデフォルトに戻す</button>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2>ゲーム終了！</h2>
+            <div class="result-table-container">
+                <table class="result-table">
+                    <tbody>
+                        <tr>
+                            <th>打鍵数</th>
+                            <td><span id="finalKeystrokes">0</span> 回</td>
+                        </tr>
+                        <tr>
+                            <th>文字数</th>
+                            <td><span id="finalCharacters">0</span> 文字</td>
+                        </tr>
+                        <tr>
+                            <th>総ミスタイプ</th>
+                            <td><span id="finalMiss">0</span> 回</td>
+                        </tr>
+                        <tr>
+                            <th>正誤率</th>
+                            <td><span id="finalAccuracy">100.0</span> %</td>
+                        </tr>
+                        <tr>
+                            <th>打鍵速度</th>
+                            <td><span id="finalTypingSpeed">0.00</span> 打/秒</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-actions">
+                <button id="quitButton">やめる</button>
+                <button id="restartButton">もう一度遊ぶ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
