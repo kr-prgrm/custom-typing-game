@@ -9,9 +9,18 @@ body {
 
 h1 {
     color: #444;
-    margin-bottom: 20px;
+    margin-bottom: 5px; /* Reduce margin to bring subtitle closer */
     font-weight: 300;
     letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    color: #666;
+    margin-top: 0; /* Remove top margin */
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 400;
 }
 
 .instruction {
