@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カスタムタイピングゲーム</title>
+    <title>タイピングゲーム</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -109,6 +109,51 @@
                 <button id="resetWordsButton" class="small-button">デフォルトに戻す</button>
             </div>
         </div>
+    </div>
+
+    <div id="explanation-section" class="game-container" style="margin-top: 50px;">
+        <h2>タイピングゲームの説明</h2>
+        <p>このタイピングゲームは、表示される漢字（またはひらがな）をローマ字で入力していくゲームです。</p>
+
+        <h3>遊び方</h3>
+        <ul>
+            <li>ゲームが始まったら、画面中央に表示される<strong>漢字（お題）</strong>とその下の<strong>ひらがな</strong>を読み、<strong>ローマ字</strong>で入力してください。</li>
+            <li>入力は、キーボードで行います。</li>
+            <li>正しく入力すると次の文字に進み、間違えるとミスとなります。ミスタイプはカウントされますが、ゲームは続行されます。</li>
+            <li>制限時間内にできるだけ多くの文字を正確に入力し、高スコアを目指しましょう。</li>
+            <li>ゲームは通常60秒間続きます。</li>
+            <li>ゲーム中に <kbd>Escape</kbd> キーを押すとゲームを中断し、結果画面を表示します。</li>
+        </ul>
+
+        <h3>設定 (⚙️ボタン)</h3>
+        <p>右上の⚙️ボタンをクリックすると、設定サイドパネルが開きます。ここでは以下の項目を調整できます。</p>
+        <ul>
+            <li><strong>タイピング音:</strong> キーを押したときの音のオン/オフを切り替えます。</li>
+            <li><strong>ミスタイプ音:</strong> 間違ったキーを押したときの音のオン/オフを切り替えます。</li>
+            <li><strong>ミスしたときの演出:</strong> ミスタイプ時に画面が赤く点滅する演出のオン/オフを切り替えます。</li>
+            <li><strong>ファイルインポート:</strong>
+                <ul>
+                    <li><strong>ローマ字ルール:</strong> Google IMEのローマ字テーブル形式（例: <code>n n</code>, <code>shi si</code>）のテキストファイルを読み込むことで、入力ルールをカスタマイズできます。独自の入力方式で練習したい場合などに便利です。</li>
+                    <li><strong>問題ファイル:</strong> 漢字とひらがなのペア（例: <code>犬 いぬ</code>）が改行で区切られたテキストファイルを読み込むことで、出題される問題を自由に変更できます。特定の単語や文章を練習したい場合にご利用ください。</li>
+                    <li>各ファイルのインポートボタンの下にある「デフォルトに戻す」ボタンで、いつでも初期設定に戻すことができます。</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>スコアと統計</h3>
+        <ul>
+            <li><strong>打鍵数:</strong> 入力したキーの総数です。</li>
+            <li><strong>文字数:</strong> 正しく入力した文字の総数です。</li>
+            <li><strong>ミス:</strong> 間違って入力した回数です。</li>
+            <li><strong>正誤率:</strong> (総打鍵数 - ミスタイプ数) / 総打鍵数 * 100 で計算されます。</li>
+            <li><strong>打鍵速度:</strong> 1秒あたりの平均打鍵数です。</li>
+        </ul>
+
+        <h3>終了と再開</h3>
+        <ul>
+            <li>ゲーム終了後は結果が表示され、もう一度プレイするか選択できます。</li>
+            <li>結果画面を閉じた後でも、「結果を表示」ボタンをクリックすればいつでも結果を確認できます。</li>
+        </ul>
     </div>
 
     <script src="script.js"></script>
