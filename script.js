@@ -23,6 +23,17 @@ let gameStartTimestamp = null;
 let errorSound = new Audio('sounds/error.mp3'); 
 let keyPressSound = new Audio('sounds/key-press.mp3'); 
 
+// --- 設定関連のグローバル変数 ---
+let isTypingSoundEnabled = true;
+let isMistypeSoundEnabled = true;
+let isMistypeEffectEnabled = true;
+
+const SETTINGS_KEYS = {
+    typingSound: 'typingGame_typingSoundEnabled',
+    mistypeSound: 'typingGame_mistypeSoundEnabled',
+    mistypeEffect: 'typingGame_mistypeEffectEnabled'
+};
+
 /**
  * カタカナをひらがなに正規化するヘルパー
  * @param {string} text
@@ -130,6 +141,7 @@ const romajiFile = document.getElementById('romajiFile');
 const targetKanji = document.getElementById('targetKanji');
 const targetKana = document.getElementById('targetKana');
 const targetRomaji = document.getElementById('targetRomaji');
+const targetWordAreaElement = document.querySelector('.target-word-area'); // Add this line
 const scoreDisplay = document.getElementById('score');
 const missDisplay = document.getElementById('miss');
 const timeLeftDisplay = document.getElementById('time-left-display');
@@ -143,13 +155,20 @@ const wordsFileName = document.getElementById('wordsFileName');
 const resultModal = document.getElementById('resultModal');
 const finalMiss = document.getElementById('finalMiss');
 const restartButton = document.getElementById('restartButton');
-const quitButton = document.getElementById('quitButton');
+const modalCloseButton = document.getElementById('modal-close-button');
 const finalKeystrokes = document.getElementById('finalKeystrokes');
 const finalCharacters = document.getElementById('finalCharacters');
 const finalTypingSpeed = document.getElementById('finalTypingSpeed');
 const resetRomajiButton = document.getElementById('resetRomajiButton');
 const resetWordsButton = document.getElementById('resetWordsButton');
 const showResultButton = document.getElementById('showResultButton');
+
+// 設定関連のDOM要素
+const settingsSidebar = document.getElementById('settings-sidebar');
+const typingSoundToggle = document.getElementById('typing-sound-toggle');
+const mistypeSoundToggle = document.getElementById('mistype-sound-toggle');
+const mistypeEffectToggle = document.getElementById('mistype-effect-toggle');
+
 
 // --- ファイル読み込み処理 ---
 
@@ -170,6 +189,11 @@ const readFileContent = (file) => {
 
 const saveToLocalStorage = (key, value) => {
     try {
+        // 設定関連のキーは専用の関数で処理
+        if (Object.values(SETTINGS_KEYS).includes(key)) {
+            saveGameSetting(key, value);
+            return;
+        }
         console.log(`saveToLocalStorage: Saving data to localStorage with key: ${key}`);
         localStorage.setItem(key, value);
     } catch (error) {
@@ -179,6 +203,10 @@ const saveToLocalStorage = (key, value) => {
 
 const loadFromLocalStorage = (key) => {
     try {
+        // 設定関連のキーは専用の関数で処理
+        if (Object.values(SETTINGS_KEYS).includes(key)) {
+            return loadGameSetting(key);
+        }
         const data = localStorage.getItem(key);
         console.log(`loadFromLocalStorage: Loading data from localStorage with key: ${key}`, data ? 'Data found' : 'No data');
         return data;
@@ -187,6 +215,49 @@ const loadFromLocalStorage = (key) => {
         return null;
     }
 };
+
+const saveGameSetting = (key, value) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        console.log(`Setting saved: ${key} = ${value}`);
+    } catch (e) {
+        console.error('Failed to save setting', key, e);
+    }
+};
+
+const loadGameSetting = (key, defaultValue = true) => {
+    try {
+        const stored = localStorage.getItem(key);
+        if (stored === null) return defaultValue;
+        return JSON.parse(stored);
+    } catch (e) {
+        console.error('Failed to load setting', key, e);
+        return defaultValue;
+    }
+};
+
+// UIに現在の設定を適用
+const applySettingsToUI = () => {
+    if (typingSoundToggle) typingSoundToggle.checked = isTypingSoundEnabled;
+    if (mistypeSoundToggle) mistypeSoundToggle.checked = isMistypeSoundEnabled;
+    if (mistypeEffectToggle) mistypeEffectToggle.checked = isMistypeEffectEnabled;
+};
+
+// 設定をロードし、変数とUIに適用する
+const loadSettings = () => {
+    isTypingSoundEnabled = loadGameSetting(SETTINGS_KEYS.typingSound, true);
+    isMistypeSoundEnabled = loadGameSetting(SETTINGS_KEYS.mistypeSound, true);
+    isMistypeEffectEnabled = loadGameSetting(SETTINGS_KEYS.mistypeEffect, true);
+    applySettingsToUI();
+};
+
+const saveSettings = () => {
+    saveGameSetting(SETTINGS_KEYS.typingSound, isTypingSoundEnabled);
+    saveGameSetting(SETTINGS_KEYS.mistypeSound, isMistypeSoundEnabled);
+    saveGameSetting(SETTINGS_KEYS.mistypeEffect, isMistypeEffectEnabled);
+};
+
+
 
 const ROMAJI_LABEL_DEFAULT = '未選択（デフォルトを使用）';
 const WORDS_LABEL_DEFAULT = '未選択（デフォルトを使用）';
@@ -786,6 +857,9 @@ const endGame = () => {
         finalAccuracy.textContent = getAccuracyValue();
     }
     resultModal.style.display = 'block';
+    if (showResultButton) {
+        showResultButton.style.display = 'block'; // Make sure the "Show Result" button is visible
+    }
     console.log(`endGame: Final score - Misses: ${missCount}, Keystrokes: ${totalKeystrokes}`);
 
 
@@ -860,8 +934,10 @@ const handleKeydownTyping = (e) => {
                 typedRomaji = nextTyped;
                 totalCharacters++;
                 
-                keyPressSound.currentTime = 0; 
-                keyPressSound.play().catch(e => console.error("Error playing sound:", e)); 
+                if (isTypingSoundEnabled) {
+                    keyPressSound.currentTime = 0; 
+                    keyPressSound.play().catch(e => console.error("Error playing sound:", e)); 
+                }
 
                 // 完全一致した場合、次の単語へ
                 if (fullMatch) {
@@ -890,13 +966,17 @@ const handleKeydownTyping = (e) => {
                 targetRomaji.innerHTML = getRomajiDisplay(currentRomaji, typedRomaji);
                 updateScroll(); // スクロール更新
                 
-                errorSound.currentTime = 0; 
-                errorSound.play().catch(e => console.error("Error playing sound:", e)); 
+                if (isMistypeSoundEnabled) {
+                    errorSound.currentTime = 0; 
+                    errorSound.play().catch(e => console.error("Error playing sound:", e)); 
+                }
 
-                targetRomaji.classList.add('error-flash'); 
-                setTimeout(() => { 
-                    targetRomaji.classList.remove('error-flash'); 
-                }, 200); 
+                if (isMistypeEffectEnabled) {
+                    targetWordAreaElement.classList.add('error-flash'); 
+                    setTimeout(() => { 
+                        targetWordAreaElement.classList.remove('error-flash'); 
+                    }, 200); 
+                }
             }
             updateTypingStatsDisplay(); // 統計情報を更新
         }
@@ -912,6 +992,65 @@ const handleKeydownTyping = (e) => {
 
 
 // --- 初期イベントリスナー ---
+const settingsButton = document.getElementById('settings-button');
+
+// 設定サイドバーのイベントリスナー
+if (settingsButton) {
+    settingsButton.addEventListener('click', () => {
+        if (settingsSidebar) {
+            settingsSidebar.classList.toggle('sidebar-open');
+            console.log('Settings sidebar toggled.');
+        }
+    });
+}
+
+// ドキュメント全体のクリックイベントリスナーで、サイドバーの外側クリックを検出
+document.addEventListener('click', (event) => {
+    // サイドバーが開いているか、クリックされた要素がサイドバーまたは設定ボタンではないかを確認
+    if (settingsSidebar && settingsSidebar.classList.contains('sidebar-open') &&
+        !settingsSidebar.contains(event.target) && !settingsButton.contains(event.target)) {
+        settingsSidebar.classList.remove('sidebar-open');
+        console.log('Settings sidebar closed by outside click.');
+    }
+});
+
+// カスタムファイル選択ボタンのイベントリスナー
+document.querySelectorAll('.import-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const targetId = button.dataset.target;
+        const hiddenInput = document.getElementById(targetId);
+        if (hiddenInput) {
+            hiddenInput.click();
+        }
+    });
+});
+
+// 設定トグルのイベントリスナー
+if (typingSoundToggle) {
+    typingSoundToggle.addEventListener('change', () => {
+        isTypingSoundEnabled = typingSoundToggle.checked;
+        saveSettings();
+        console.log('Typing sound toggled:', isTypingSoundEnabled);
+    });
+}
+
+if (mistypeSoundToggle) {
+    mistypeSoundToggle.addEventListener('change', () => {
+        isMistypeSoundEnabled = mistypeSoundToggle.checked;
+        saveSettings();
+        console.log('Mistype sound toggled:', isMistypeSoundEnabled);
+    });
+}
+
+if (mistypeEffectToggle) {
+    mistypeEffectToggle.addEventListener('change', () => {
+        isMistypeEffectEnabled = mistypeEffectToggle.checked;
+        saveSettings();
+        console.log('Mistype effect toggled:', isMistypeEffectEnabled);
+    });
+}
+
+
 // ファイルインポートのイベントリスナー
 wordsFile.addEventListener('change', loadWords);
 romajiFile.addEventListener('change', loadRomajiRules);
@@ -921,7 +1060,7 @@ restartButton.addEventListener('click', () => {
     console.log('Restart button clicked.');
     resultModal.style.display = 'none';
     if (showResultButton) {
-        showResultButton.style.display = 'none';
+        showResultButton.style.display = 'none'; // Hide the "Show Result" button on restart
     }
     gameActive = false;
     typedRomaji = '';
@@ -934,20 +1073,31 @@ restartButton.addEventListener('click', () => {
     checkReadyToStart();
 });
 
-quitButton.addEventListener('click', () => {
-    console.log('Quit button clicked.');
-    resultModal.style.display = 'none';
-    if (showResultButton) {
-        showResultButton.style.display = 'block';
-    }
-});
+// モーダル閉じるボタンのイベントリスナー
+if (modalCloseButton) {
+    modalCloseButton.addEventListener('click', () => {
+        resultModal.style.display = 'none';
+        if (showResultButton) {
+            showResultButton.style.display = 'block';
+        }
+    });
+}
 
+// 結果再表示ボタンのイベントリスナー
 if (showResultButton) {
     showResultButton.addEventListener('click', () => {
         console.log('Show Result button clicked.');
         resultModal.style.display = 'block';
     });
 }
+
+// モーダルの外側をクリックしたときのイベントリスナー
+resultModal.addEventListener('click', (event) => {
+    if (event.target === resultModal) {
+        resultModal.style.display = 'none';
+    }
+});
+
 
 if (resetRomajiButton) {
     resetRomajiButton.addEventListener('click', (e) => {
@@ -973,4 +1123,5 @@ checkReadyToStart();
 updateTypingStatsDisplay();
 loadStoredFiles();
 loadDefaultFiles();
+loadSettings(); // ★追加: 設定をロードする
 console.log('Initialization complete.');
